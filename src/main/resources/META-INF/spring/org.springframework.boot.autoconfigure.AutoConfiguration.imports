@@ -1,0 +1,3 @@
+com.ernoxin.zibaljavasdk.config.ZibalAutoConfiguration
+com.ernoxin.zibaljavasdk.ebank.config.ZibalEbankAutoConfiguration
+com.ernoxin.zibaljavasdk.platform.config.ZibalPlatformAutoConfiguration
