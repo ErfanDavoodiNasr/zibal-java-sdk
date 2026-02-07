@@ -3,6 +3,9 @@ package com.ernoxin.zibaljavasdk.model;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Known payment status values returned by Zibal.
+ */
 public enum ZibalPaymentStatus {
     WAITING_FOR_PAYMENT(-1, "Waiting for payment"),
     INTERNAL_ERROR(-2, "Internal error"),
@@ -39,6 +42,12 @@ public enum ZibalPaymentStatus {
         this.description = description;
     }
 
+    /**
+     * Resolves enum by numeric status code.
+     *
+     * @param code status code
+     * @return matching status, or {@code null} when unknown
+     */
     public static ZibalPaymentStatus fromCode(Integer code) {
         if (code == null) {
             return null;
@@ -46,10 +55,20 @@ public enum ZibalPaymentStatus {
         return LOOKUP.get(code);
     }
 
+    /**
+     * Returns numeric status code.
+     *
+     * @return status code
+     */
     public int code() {
         return code;
     }
 
+    /**
+     * Returns human-readable status description.
+     *
+     * @return status description
+     */
     public String description() {
         return description;
     }

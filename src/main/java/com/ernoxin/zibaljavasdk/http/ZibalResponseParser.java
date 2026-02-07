@@ -10,10 +10,31 @@ import org.springframework.http.ResponseEntity;
 
 import java.util.Set;
 
+/**
+ * Decodes raw HTTP responses from the standard Zibal payment API.
+ *
+ * <p>Parser behavior:
+ * <ul>
+ *   <li>requires a non-empty response body</li>
+ *   <li>requires a numeric {@code result} code</li>
+ *   <li>requires result code to be in provided success codes</li>
+ *   <li>requires a 2xx HTTP status</li>
+ * </ul>
+ */
 @RequiredArgsConstructor
 public final class ZibalResponseParser {
     private final ObjectMapper mapper;
 
+    /**
+     * Parses API response body into a target type.
+     *
+     * @param response raw response entity
+     * @param successCodes result codes treated as successful
+     * @param dataType destination Java type
+     * @param <T> destination type
+     * @return mapped response object
+     * @throws ZibalApiException when response body, status, or result code is invalid
+     */
     public <T> T parse(ResponseEntity<String> response, Set<Integer> successCodes, Class<T> dataType) {
         int httpStatus = response.getStatusCode().value();
         String body = response.getBody();

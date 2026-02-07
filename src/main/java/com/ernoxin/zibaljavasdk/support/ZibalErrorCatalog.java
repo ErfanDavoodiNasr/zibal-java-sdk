@@ -4,6 +4,9 @@ import lombok.experimental.UtilityClass;
 
 import java.util.Map;
 
+/**
+ * Catalog of known result codes returned by the standard Zibal gateway API.
+ */
 @UtilityClass
 public class ZibalErrorCatalog {
     private static final Map<Integer, String> RESULT_MESSAGES = Map.ofEntries(
@@ -27,6 +30,12 @@ public class ZibalErrorCatalog {
             Map.entry(203, "TrackId is invalid")
     );
 
+    /**
+     * Resolves the best-known message for a gateway result code.
+     *
+     * @param code result code from API response
+     * @return mapped message, or {@code null} when unknown
+     */
     public static String messageForResult(Integer code) {
         if (code == null) {
             return null;

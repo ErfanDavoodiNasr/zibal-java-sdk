@@ -10,16 +10,36 @@ import com.ernoxin.zibaljavasdk.platform.support.ZibalPlatformValidation;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * High-level client for Zibal Platform APIs.
+ *
+ * <p>Provides wallet, refund, checkout-report, gateway-report, and sub-merchant operations.
+ * Amount values are interpreted as <strong>IRR</strong>.
+ *
+ * <p>Instances are immutable and intended for reuse across threads.
+ */
 public final class ZibalPlatformClient {
     private static final Set<Integer> SUCCESS_RESULT = Set.of(1);
 
     private final ZibalPlatformConfig config;
     private final ZibalPlatformHttpClient httpClient;
 
+    /**
+     * Creates a client with default HTTP transport.
+     *
+     * @param config platform runtime config
+     */
     public ZibalPlatformClient(ZibalPlatformConfig config) {
         this(config, ZibalPlatformHttpClient.create(config));
     }
 
+    /**
+     * Creates a client with explicit HTTP transport.
+     *
+     * @param config platform runtime config
+     * @param httpClient platform HTTP transport
+     * @throws PlatformValidationException if any argument is {@code null}
+     */
     public ZibalPlatformClient(ZibalPlatformConfig config, ZibalPlatformHttpClient httpClient) {
         if (config == null) {
             throw new PlatformValidationException("config is required");
@@ -31,10 +51,21 @@ public final class ZibalPlatformClient {
         this.httpClient = httpClient;
     }
 
+    /**
+     * Lists wallets available for the current API key.
+     *
+     * @return wallet list response
+     */
     public WalletListResponse listWallets() {
         return httpClient.get(ZibalPlatformEndpoints.WALLET_LIST, null, WalletListResponse.class, SUCCESS_RESULT);
     }
 
+    /**
+     * Retrieves balance for a wallet.
+     *
+     * @param request wallet-balance request
+     * @return wallet balance response
+     */
     public WalletBalanceResponse getWalletBalance(WalletBalanceRequest request) {
         if (request == null) {
             throw new PlatformValidationException("wallet balance request is required");
@@ -43,6 +74,12 @@ public final class ZibalPlatformClient {
         return httpClient.post(ZibalPlatformEndpoints.WALLET_BALANCE, request, WalletBalanceResponse.class, SUCCESS_RESULT);
     }
 
+    /**
+     * Creates a refund request.
+     *
+     * @param request refund request
+     * @return refund response
+     */
     public RefundResponse createRefund(RefundRequest request) {
         if (request == null) {
             throw new PlatformValidationException("refund request is required");
@@ -51,6 +88,12 @@ public final class ZibalPlatformClient {
         return httpClient.post(ZibalPlatformEndpoints.ACCOUNT_REFUND, request, RefundResponse.class, SUCCESS_RESULT);
     }
 
+    /**
+     * Reports checkout settlements.
+     *
+     * @param request checkout report request
+     * @return checkout report response
+     */
     public CheckoutReportResponse reportCheckouts(CheckoutReportRequest request) {
         if (request == null) {
             throw new PlatformValidationException("checkout report request is required");
@@ -59,6 +102,12 @@ public final class ZibalPlatformClient {
         return httpClient.post(ZibalPlatformEndpoints.REPORT_CHECKOUT, request, CheckoutReportResponse.class, SUCCESS_RESULT);
     }
 
+    /**
+     * Reports checkout queue entries.
+     *
+     * @param request checkout queue request
+     * @return checkout queue response
+     */
     public CheckoutQueueResponse reportCheckoutQueue(CheckoutQueueRequest request) {
         if (request == null) {
             throw new PlatformValidationException("checkout queue request is required");
@@ -67,6 +116,12 @@ public final class ZibalPlatformClient {
         return httpClient.post(ZibalPlatformEndpoints.REPORT_CHECKOUT_QUEUE, request, CheckoutQueueResponse.class, SUCCESS_RESULT);
     }
 
+    /**
+     * Inquires a checkout by request ID or unique code.
+     *
+     * @param request checkout inquiry request
+     * @return checkout inquiry response
+     */
     public CheckoutInquireResponse inquireCheckout(CheckoutInquireRequest request) {
         if (request == null) {
             throw new PlatformValidationException("checkout inquire request is required");
@@ -75,6 +130,12 @@ public final class ZibalPlatformClient {
         return httpClient.post(ZibalPlatformEndpoints.REPORT_CHECKOUT_INQUIRE, request, CheckoutInquireResponse.class, SUCCESS_RESULT);
     }
 
+    /**
+     * Reports gateway transactions.
+     *
+     * @param request transaction report request
+     * @return gateway transaction report response
+     */
     public GatewayTransactionReportResponse reportGatewayTransactions(GatewayTransactionReportRequest request) {
         if (request == null) {
             throw new PlatformValidationException("gateway report request is required");
@@ -83,6 +144,12 @@ public final class ZibalPlatformClient {
         return httpClient.post(ZibalPlatformEndpoints.REPORT_GATEWAY_TRANSACTION, request, GatewayTransactionReportResponse.class, SUCCESS_RESULT);
     }
 
+    /**
+     * Inquires a refund by refund ID or transaction track ID.
+     *
+     * @param request refund inquiry request
+     * @return refund inquiry response
+     */
     public RefundInquiryResponse inquireRefund(RefundInquiryRequest request) {
         if (request == null) {
             throw new PlatformValidationException("refund inquiry request is required");
@@ -91,6 +158,12 @@ public final class ZibalPlatformClient {
         return httpClient.post(ZibalPlatformEndpoints.ACCOUNT_REFUND_INQUIRY, request, RefundInquiryResponse.class, SUCCESS_RESULT);
     }
 
+    /**
+     * Lists refunds.
+     *
+     * @param request refund list request
+     * @return refund list response
+     */
     public RefundListResponse listRefunds(RefundListRequest request) {
         if (request == null) {
             throw new PlatformValidationException("refund list request is required");
@@ -99,6 +172,12 @@ public final class ZibalPlatformClient {
         return httpClient.post(ZibalPlatformEndpoints.ACCOUNT_REFUND_LIST, request, RefundListResponse.class, SUCCESS_RESULT);
     }
 
+    /**
+     * Creates a sub-merchant.
+     *
+     * @param request sub-merchant create request
+     * @return create response
+     */
     public SubMerchantCreateResponse createSubMerchant(SubMerchantCreateRequest request) {
         if (request == null) {
             throw new PlatformValidationException("sub-merchant create request is required");
@@ -107,6 +186,12 @@ public final class ZibalPlatformClient {
         return httpClient.post(ZibalPlatformEndpoints.SUB_MERCHANT_CREATE, request, SubMerchantCreateResponse.class, SUCCESS_RESULT);
     }
 
+    /**
+     * Lists sub-merchants.
+     *
+     * @param request sub-merchant list request
+     * @return list response
+     */
     public SubMerchantListResponse listSubMerchants(SubMerchantListRequest request) {
         if (request == null) {
             throw new PlatformValidationException("sub-merchant list request is required");
@@ -115,6 +200,12 @@ public final class ZibalPlatformClient {
         return httpClient.post(ZibalPlatformEndpoints.SUB_MERCHANT_LIST, request, SubMerchantListResponse.class, SUCCESS_RESULT);
     }
 
+    /**
+     * Edits sub-merchant metadata.
+     *
+     * @param request sub-merchant edit request
+     * @return edit response
+     */
     public SubMerchantEditResponse editSubMerchant(SubMerchantEditRequest request) {
         if (request == null) {
             throw new PlatformValidationException("sub-merchant edit request is required");

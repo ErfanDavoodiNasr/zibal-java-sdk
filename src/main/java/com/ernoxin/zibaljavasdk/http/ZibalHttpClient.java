@@ -26,12 +26,34 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * Low-level HTTP client used by {@code ZibalClient}.
+ *
+ * <p>This class sends JSON requests via Spring {@link RestTemplate}, applies configured retry behavior,
+ * and delegates response decoding to {@link ZibalResponseParser}.
+ *
+ * <p>Retry policy:
+ * <ul>
+ *   <li>Retries are attempted only for {@link RestClientException} transport failures</li>
+ *   <li>A fixed backoff is used between attempts</li>
+ *   <li>No automatic idempotency protection is provided</li>
+ * </ul>
+ *
+ * <p>Thread-safety: instances are intended to be shared after construction.
+ */
 public final class ZibalHttpClient {
     private final ZibalConfig config;
     private final RestTemplate restTemplate;
     private final ObjectMapper mapper;
     private final ZibalResponseParser responseParser;
 
+    /**
+     * Creates an HTTP client with explicit dependencies.
+     *
+     * @param config validated SDK config
+     * @param restTemplate transport implementation
+     * @param mapper JSON mapper for request serialization
+     */
     public ZibalHttpClient(ZibalConfig config, RestTemplate restTemplate, ObjectMapper mapper) {
         this.config = config;
         this.restTemplate = restTemplate;
@@ -40,6 +62,12 @@ public final class ZibalHttpClient {
         configureRestTemplate(restTemplate, config);
     }
 
+    /**
+     * Creates a default HTTP client using Java's {@link HttpClient} via {@link JdkClientHttpRequestFactory}.
+     *
+     * @param config validated SDK config
+     * @return configured HTTP client
+     */
     public static ZibalHttpClient create(ZibalConfig config) {
         ObjectMapper mapper = ZibalObjectMapper.create();
         HttpClient httpClient = HttpClient.newBuilder()
@@ -72,6 +100,18 @@ public final class ZibalHttpClient {
         }
     }
 
+    /**
+     * Sends a JSON POST request to Zibal and parses the response.
+     *
+     * @param path API path appended to configured base URL
+     * @param request request payload object serialized as JSON
+     * @param dataType target response type
+     * @param successCodes gateway result codes considered successful
+     * @param <T> response type
+     * @return parsed response object
+     * @throws ZibalValidationException when request serialization fails
+     * @throws ZibalTransportException when transport fails after retries
+     */
     public <T> T post(String path, Object request, Class<T> dataType, Set<Integer> successCodes) {
         URI baseUrl = config.baseUrl();
         URI url = UriComponentsBuilder.fromUri(baseUrl).path(path).build().toUri();

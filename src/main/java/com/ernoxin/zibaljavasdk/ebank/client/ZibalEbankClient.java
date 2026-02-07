@@ -12,16 +12,45 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * High-level client for Zibal eBank APIs.
+ *
+ * <p>Typical flow:
+ * <pre>{@code
+ * ZibalEbankConfig config = ZibalEbankConfig.builder("access-token").build();
+ * ZibalEbankClient client = new ZibalEbankClient(config);
+ *
+ * CheckoutResponse response = client.createCheckout(
+ *         CheckoutCreateRequest.builder("account-id", 50_000L, "IR1234...")
+ *                 .description("Settlement")
+ *                 .build()
+ * );
+ * }</pre>
+ *
+ * <p>Amounts are in <strong>IRR</strong>. Instances are immutable and intended for reuse across threads.
+ */
 public final class ZibalEbankClient {
     private static final Set<Integer> SUCCESS_RESULT = Set.of(1);
 
     private final ZibalEbankConfig config;
     private final ZibalEbankHttpClient httpClient;
 
+    /**
+     * Creates a client with default HTTP transport.
+     *
+     * @param config eBank runtime config
+     */
     public ZibalEbankClient(ZibalEbankConfig config) {
         this(config, ZibalEbankHttpClient.create(config));
     }
 
+    /**
+     * Creates a client with explicit HTTP transport.
+     *
+     * @param config eBank runtime config
+     * @param httpClient HTTP transport
+     * @throws EbankValidationException if any argument is {@code null}
+     */
     public ZibalEbankClient(ZibalEbankConfig config, ZibalEbankHttpClient httpClient) {
         if (config == null) {
             throw new EbankValidationException("config is required");
@@ -33,6 +62,12 @@ public final class ZibalEbankClient {
         this.httpClient = httpClient;
     }
 
+    /**
+     * Creates a checkout request.
+     *
+     * @param request checkout request payload
+     * @return checkout response
+     */
     public CheckoutResponse createCheckout(CheckoutCreateRequest request) {
         if (request == null) {
             throw new EbankValidationException("checkout request is required");
@@ -41,6 +76,12 @@ public final class ZibalEbankClient {
         return httpClient.post(ZibalEbankEndpoints.CHECKOUT_CREATE, request, CheckoutResponse.class, SUCCESS_RESULT);
     }
 
+    /**
+     * Inquires a single checkout by tracker or unique code.
+     *
+     * @param request inquire request
+     * @return checkout response
+     */
     public CheckoutResponse inquireCheckout(CheckoutInquireRequest request) {
         if (request == null) {
             throw new EbankValidationException("inquire request is required");
@@ -53,6 +94,12 @@ public final class ZibalEbankClient {
         return httpClient.get(ZibalEbankEndpoints.CHECKOUT_INQUIRE, params, CheckoutResponse.class, SUCCESS_RESULT);
     }
 
+    /**
+     * Lists checkout records.
+     *
+     * @param request list request
+     * @return paginated checkout list
+     */
     public CheckoutListResponse listCheckouts(CheckoutListRequest request) {
         if (request == null) {
             throw new EbankValidationException("list request is required");
@@ -68,6 +115,12 @@ public final class ZibalEbankClient {
         return httpClient.get(ZibalEbankEndpoints.CHECKOUT_LIST, params, CheckoutListResponse.class, SUCCESS_RESULT);
     }
 
+    /**
+     * Cancels one or more checkout records.
+     *
+     * @param request cancel request
+     * @return cancellation result
+     */
     public CheckoutCancelResponse cancelCheckout(CheckoutCancelRequest request) {
         if (request == null) {
             throw new EbankValidationException("cancel request is required");
@@ -76,6 +129,12 @@ public final class ZibalEbankClient {
         return httpClient.post(ZibalEbankEndpoints.CHECKOUT_CANCEL, request, CheckoutCancelResponse.class, SUCCESS_RESULT);
     }
 
+    /**
+     * Lists account statement rows.
+     *
+     * @param request statement request
+     * @return statement list response
+     */
     public StatementListResponse listStatements(StatementListRequest request) {
         if (request == null) {
             throw new EbankValidationException("statement request is required");
@@ -91,6 +150,12 @@ public final class ZibalEbankClient {
         return httpClient.get(ZibalEbankEndpoints.STATEMENT_LIST, params, StatementListResponse.class, SUCCESS_RESULT);
     }
 
+    /**
+     * Retrieves account balance.
+     *
+     * @param request balance request
+     * @return balance response
+     */
     public BalanceResponse getBalance(BalanceRequest request) {
         if (request == null) {
             throw new EbankValidationException("balance request is required");
@@ -102,6 +167,12 @@ public final class ZibalEbankClient {
         return httpClient.get(ZibalEbankEndpoints.BALANCE, params, BalanceResponse.class, SUCCESS_RESULT);
     }
 
+    /**
+     * Lists available accounts.
+     *
+     * @param request optional account filter request; may be {@code null}
+     * @return account list response
+     */
     public AccountListResponse listAccounts(AccountListRequest request) {
         Map<String, Object> params = new HashMap<>();
         if (request != null) {
@@ -110,6 +181,12 @@ public final class ZibalEbankClient {
         return httpClient.get(ZibalEbankEndpoints.ACCOUNT_LIST, params, AccountListResponse.class, SUCCESS_RESULT);
     }
 
+    /**
+     * Lists identified payment items.
+     *
+     * @param request list request
+     * @return identified-payment list response
+     */
     public IdentifiedPaymentListResponse listIdentifiedPayments(IdentifiedPaymentListRequest request) {
         if (request == null) {
             throw new EbankValidationException("identified payment list request is required");
@@ -125,6 +202,12 @@ public final class ZibalEbankClient {
         return httpClient.get(ZibalEbankEndpoints.IDENTIFIED_PAYMENT_LIST, params, IdentifiedPaymentListResponse.class, SUCCESS_RESULT);
     }
 
+    /**
+     * Inquires a single identified payment.
+     *
+     * @param request inquiry request
+     * @return identified-payment response list wrapper
+     */
     public IdentifiedPaymentListResponse inquireIdentifiedPayment(IdentifiedPaymentInquireRequest request) {
         if (request == null) {
             throw new EbankValidationException("identified payment inquire request is required");
@@ -137,6 +220,12 @@ public final class ZibalEbankClient {
         return httpClient.get(ZibalEbankEndpoints.IDENTIFIED_PAYMENT_INQUIRE, params, IdentifiedPaymentListResponse.class, SUCCESS_RESULT);
     }
 
+    /**
+     * Changes identified payment status.
+     *
+     * @param request status change request (2=confirm, 3=reject)
+     * @return status change response
+     */
     public IdentifiedPaymentStatusChangeResponse changeIdentifiedPaymentStatus(IdentifiedPaymentStatusChangeRequest request) {
         if (request == null) {
             throw new EbankValidationException("identified payment status request is required");

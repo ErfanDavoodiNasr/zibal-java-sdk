@@ -7,30 +7,62 @@ import java.net.URI;
 import java.util.Locale;
 import java.util.regex.Pattern;
 
+/**
+ * Validation helpers used by the standard gateway API implementation.
+ */
 @UtilityClass
 public class ZibalValidation {
     private static final Pattern CARD_PATTERN = Pattern.compile("^\\d{16}$");
     private static final Pattern NATIONAL_CODE_PATTERN = Pattern.compile("^\\d{10}$");
     private static final Pattern IBAN_PATTERN = Pattern.compile("^IR\\d{24}$");
 
+    /**
+     * Requires a non-null and non-blank string.
+     *
+     * @param value candidate value
+     * @param field field name used in exception messages
+     * @throws ZibalValidationException if the value is null or blank
+     */
     public static void requireNonBlank(String value, String field) {
         if (value == null || value.isBlank()) {
             throw new ZibalValidationException(field + " is required");
         }
     }
 
+    /**
+     * Requires a strictly positive long value.
+     *
+     * @param value candidate numeric value
+     * @param field field name used in exception messages
+     * @throws ZibalValidationException if value is zero or negative
+     */
     public static void requirePositive(long value, String field) {
         if (value <= 0) {
             throw new ZibalValidationException(field + " must be positive");
         }
     }
 
+    /**
+     * Requires a value greater than or equal to the given minimum.
+     *
+     * @param value candidate numeric value
+     * @param min minimum allowed value
+     * @param field field name used in exception messages
+     * @throws ZibalValidationException if value is below minimum
+     */
     public static void requireMin(long value, long min, String field) {
         if (value < min) {
             throw new ZibalValidationException(field + " must be at least " + min);
         }
     }
 
+    /**
+     * Requires an absolute HTTP or HTTPS URI.
+     *
+     * @param uri candidate URI
+     * @param field field name used in exception messages
+     * @throws ZibalValidationException if URI is null, relative, or unsupported scheme
+     */
     public static void requireHttpUri(URI uri, String field) {
         if (uri == null) {
             throw new ZibalValidationException(field + " is required");
@@ -44,6 +76,13 @@ public class ZibalValidation {
         }
     }
 
+    /**
+     * Requires an absolute HTTPS URI.
+     *
+     * @param uri candidate URI
+     * @param field field name used in exception messages
+     * @throws ZibalValidationException if URI is null, relative, or non-HTTPS
+     */
     public static void requireHttpsUri(URI uri, String field) {
         if (uri == null) {
             throw new ZibalValidationException(field + " is required");
@@ -57,6 +96,13 @@ public class ZibalValidation {
         }
     }
 
+    /**
+     * Requires a 16-digit card number string.
+     *
+     * @param value card number
+     * @param field field name used in exception messages
+     * @throws ZibalValidationException if value is blank or malformed
+     */
     public static void requireCardNumber(String value, String field) {
         requireNonBlank(value, field);
         String trimmed = value.trim();
@@ -65,6 +111,12 @@ public class ZibalValidation {
         }
     }
 
+    /**
+     * Requires a 10-digit national code.
+     *
+     * @param value national code
+     * @throws ZibalValidationException if value is blank or malformed
+     */
     public static void requireNationalCode(String value) {
         requireNonBlank(value, "nationalCode");
         String trimmed = value.trim();
@@ -73,6 +125,13 @@ public class ZibalValidation {
         }
     }
 
+    /**
+     * Requires an Iranian IBAN in {@code IR########################} format.
+     *
+     * @param value IBAN value
+     * @param field field name used in exception messages
+     * @throws ZibalValidationException if value is blank or malformed
+     */
     public static void requireIban(String value, String field) {
         requireNonBlank(value, field);
         String normalized = value.trim().toUpperCase(Locale.ROOT);
@@ -81,6 +140,13 @@ public class ZibalValidation {
         }
     }
 
+    /**
+     * Requires mode value to be either {@code 0} or {@code 1}; {@code null} is allowed.
+     *
+     * @param value mode value
+     * @param field field name used in exception messages
+     * @throws ZibalValidationException if value is not null and outside the allowed set
+     */
     public static void requireMode(Integer value, String field) {
         if (value == null) {
             return;
@@ -90,6 +156,12 @@ public class ZibalValidation {
         }
     }
 
+    /**
+     * Normalizes a base URL by removing trailing slash characters.
+     *
+     * @param uri URI to normalize
+     * @return normalized URI
+     */
     public static URI normalizeBaseUrl(URI uri) {
         String value = uri.toString();
         while (value.endsWith("/")) {

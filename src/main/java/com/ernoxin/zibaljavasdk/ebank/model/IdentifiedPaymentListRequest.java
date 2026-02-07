@@ -1,5 +1,15 @@
 package com.ernoxin.zibaljavasdk.ebank.model;
 
+/**
+ * Request for listing identified payments.
+ *
+ * @param accountId account identifier
+ * @param fromDate from date
+ * @param toDate to date
+ * @param status optional status filter
+ * @param size page size
+ * @param page page number
+ */
 public record IdentifiedPaymentListRequest(
         String accountId,
         String fromDate,
@@ -8,10 +18,21 @@ public record IdentifiedPaymentListRequest(
         Integer size,
         Integer page
 ) {
+    /**
+     * Starts builder with required fields.
+     *
+     * @param accountId account identifier
+     * @param fromDate from date
+     * @param toDate to date
+     * @return mutable builder
+     */
     public static Builder builder(String accountId, String fromDate, String toDate) {
         return new Builder(accountId, fromDate, toDate);
     }
 
+    /**
+     * Mutable builder for {@link IdentifiedPaymentListRequest}.
+     */
     public static final class Builder {
         private final String accountId;
         private final String fromDate;
@@ -26,21 +47,44 @@ public record IdentifiedPaymentListRequest(
             this.toDate = toDate;
         }
 
+        /**
+         * Sets status filter.
+         *
+         * @param status status code
+         * @return this builder
+         */
         public Builder status(Integer status) {
             this.status = status;
             return this;
         }
 
+        /**
+         * Sets page size.
+         *
+         * @param size page size
+         * @return this builder
+         */
         public Builder size(Integer size) {
             this.size = size;
             return this;
         }
 
+        /**
+         * Sets page number.
+         *
+         * @param page page number
+         * @return this builder
+         */
         public Builder page(Integer page) {
             this.page = page;
             return this;
         }
 
+        /**
+         * Builds request.
+         *
+         * @return identified-payment list request
+         */
         public IdentifiedPaymentListRequest build() {
             return new IdentifiedPaymentListRequest(accountId, fromDate, toDate, status, size, page);
         }
