@@ -10,10 +10,22 @@ import org.springframework.http.ResponseEntity;
 
 import java.util.Set;
 
+/**
+ * Parses raw platform HTTP responses into typed models.
+ */
 @RequiredArgsConstructor
 public final class ZibalPlatformResponseParser {
     private final ObjectMapper mapper;
 
+    /**
+     * Parses response body and validates platform success markers.
+     *
+     * @param response raw response
+     * @param successCodes accepted result codes
+     * @param dataType destination type
+     * @param <T> destination type
+     * @return mapped response model
+     */
     public <T> T parse(ResponseEntity<String> response, Set<Integer> successCodes, Class<T> dataType) {
         int httpStatus = response.getStatusCode().value();
         String body = response.getBody();

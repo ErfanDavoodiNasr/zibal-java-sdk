@@ -4,6 +4,9 @@ import lombok.experimental.UtilityClass;
 
 import java.util.Map;
 
+/**
+ * Known eBank API result-code catalog.
+ */
 @UtilityClass
 public class ZibalEbankErrorCatalog {
     private static final Map<Integer, String> RESULT_MESSAGES = Map.ofEntries(
@@ -23,6 +26,12 @@ public class ZibalEbankErrorCatalog {
             Map.entry(45, "Providers are unavailable")
     );
 
+    /**
+     * Returns known message for a result code.
+     *
+     * @param code result code
+     * @return mapped message, or {@code null} when unknown
+     */
     public static String messageForResult(Integer code) {
         if (code == null) {
             return null;

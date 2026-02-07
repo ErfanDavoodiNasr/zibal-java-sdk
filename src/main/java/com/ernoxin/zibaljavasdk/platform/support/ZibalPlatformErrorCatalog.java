@@ -4,6 +4,9 @@ import lombok.experimental.UtilityClass;
 
 import java.util.Map;
 
+/**
+ * Known platform API result-code catalog.
+ */
 @UtilityClass
 public class ZibalPlatformErrorCatalog {
     private static final Map<Integer, String> RESULT_MESSAGES = Map.ofEntries(
@@ -37,6 +40,12 @@ public class ZibalPlatformErrorCatalog {
             Map.entry(26, "IBAN inquiry credit exhausted")
     );
 
+    /**
+     * Returns known message for a result code.
+     *
+     * @param code result code
+     * @return mapped message, or {@code null} when unknown
+     */
     public static String messageForResult(Integer code) {
         if (code == null) {
             return null;

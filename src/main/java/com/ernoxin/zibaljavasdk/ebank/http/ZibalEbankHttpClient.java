@@ -27,12 +27,25 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * Low-level HTTP client for eBank APIs.
+ *
+ * <p>Behavior mirrors other SDK transports:
+ * retries are applied only to transport failures and do not add idempotency guarantees.
+ */
 public final class ZibalEbankHttpClient {
     private final ZibalEbankConfig config;
     private final RestTemplate restTemplate;
     private final ObjectMapper mapper;
     private final ZibalEbankResponseParser responseParser;
 
+    /**
+     * Creates an HTTP client with explicit dependencies.
+     *
+     * @param config eBank runtime config
+     * @param restTemplate REST transport
+     * @param mapper JSON mapper
+     */
     public ZibalEbankHttpClient(ZibalEbankConfig config, RestTemplate restTemplate, ObjectMapper mapper) {
         this.config = config;
         this.restTemplate = restTemplate;
@@ -41,6 +54,12 @@ public final class ZibalEbankHttpClient {
         configureRestTemplate(restTemplate, config);
     }
 
+    /**
+     * Creates default HTTP client based on JDK HttpClient.
+     *
+     * @param config eBank runtime config
+     * @return configured HTTP client
+     */
     public static ZibalEbankHttpClient create(ZibalEbankConfig config) {
         ObjectMapper mapper = ZibalObjectMapper.create();
         HttpClient httpClient = HttpClient.newBuilder()
@@ -73,12 +92,32 @@ public final class ZibalEbankHttpClient {
         }
     }
 
+    /**
+     * Sends a POST request with JSON body.
+     *
+     * @param path API path
+     * @param request request payload object
+     * @param dataType response type
+     * @param successCodes accepted API result codes
+     * @param <T> response type
+     * @return parsed response
+     */
     public <T> T post(String path, Object request, Class<T> dataType, Set<Integer> successCodes) {
         URI url = UriComponentsBuilder.fromUri(config.baseUrl()).path(path).build().toUri();
         String body = writeBody(request);
         return execute(HttpMethod.POST, url, body, dataType, successCodes);
     }
 
+    /**
+     * Sends a GET request with optional query params.
+     *
+     * @param path API path
+     * @param queryParams query params map
+     * @param dataType response type
+     * @param successCodes accepted API result codes
+     * @param <T> response type
+     * @return parsed response
+     */
     public <T> T get(String path, Map<String, Object> queryParams, Class<T> dataType, Set<Integer> successCodes) {
         UriComponentsBuilder builder = UriComponentsBuilder.fromUri(config.baseUrl()).path(path);
         if (queryParams != null) {
